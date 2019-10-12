@@ -3,8 +3,16 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: hogehoge
     container:
       image: ruby:2.6.4
+      env:
+        MYSQL_HOST: mysql
+        MYSQL_ROOT_PASSWORD: hogehoge
     steps:
     - uses: actions/checkout@v1
     - name: Set up yarn and node
