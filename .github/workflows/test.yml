@@ -5,6 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      id: bundle-cache
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
+    - uses: actions/cache@v1
+      id: yarn-cache
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
     - name: Setup ruby
       uses: actions/setup-ruby@v1
       with:
@@ -15,10 +25,15 @@ jobs:
     - name: Install packages
       run: |
         sudo apt-get install -y libsqlite3-dev
+    - name: Install gems
+      run: |
+        bundle -j 4 --path vendor/bundle
+    - name: Install node modules
+      run: |
+        yarn
     - name: Build
       run: |
-        bundle -j 4
-        bin/rails yarn:install db:setup assets:precompile
+        bin/rails db:setup assets:precompile
     - name: Run test
       run: |
         bin/rails test
